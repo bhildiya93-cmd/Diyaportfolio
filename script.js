@@ -1,194 +1,110 @@
-/* =========================================================
-   DIYA PERSONAL PORTFOLIO
-   Simple JavaScript for beginners
-   ========================================================= */
+// ================================
+// MOBILE NAVIGATION
+// ================================
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    /* =========================
-       SELECT ELEMENTS
-    ========================== */
-
-    const menuToggle = document.getElementById("menu-toggle");
-    const navMenu = document.getElementById("nav-menu");
-    const navLinks = document.querySelectorAll(".nav-menu a");
-    const sections = document.querySelectorAll("main section");
+const menuBtn = document.getElementById("menuBtn");
+const navLinks = document.getElementById("navLinks");
+const navItems = document.querySelectorAll(".nav-link");
 
 
-    /* =========================
-       ENABLE JAVASCRIPT FEATURES
-       The CSS keeps the website
-       visible if JavaScript fails.
-    ========================== */
+// Open and close mobile menu
+menuBtn.addEventListener("click", function () {
 
-    document.documentElement.classList.add("js-enabled");
+    navLinks.classList.toggle("show");
 
-
-    /* =========================
-       MOBILE NAVIGATION
-    ========================== */
-
-    if (menuToggle && navMenu) {
-
-        // Open and close the mobile menu
-        menuToggle.addEventListener("click", function () {
-
-            const isOpen = navMenu.classList.toggle("active");
-
-            menuToggle.setAttribute("aria-expanded", isOpen);
-
-            menuToggle.setAttribute(
-                "aria-label",
-                isOpen ? "Close navigation menu" : "Open navigation menu"
-            );
-        });
+});
 
 
-        // Close menu after clicking a navigation link
-        navLinks.forEach(function (link) {
+// Close mobile menu after clicking a link
+navItems.forEach(function (link) {
 
-            link.addEventListener("click", function () {
+    link.addEventListener("click", function () {
 
-                navMenu.classList.remove("active");
+        navLinks.classList.remove("show");
 
-                menuToggle.setAttribute("aria-expanded", "false");
+    });
 
-                menuToggle.setAttribute(
-                    "aria-label",
-                    "Open navigation menu"
-                );
-            });
-
-        });
+});
 
 
-        // Close menu if the screen becomes desktop-sized
-        window.addEventListener("resize", function () {
+// ================================
+// ACTIVE NAVIGATION
+// ================================
 
-            if (window.innerWidth >= 900) {
+const sections = document.querySelectorAll("section[id]");
 
-                navMenu.classList.remove("active");
+const observer = new IntersectionObserver(
+    function (entries) {
 
-                menuToggle.setAttribute("aria-expanded", "false");
+        entries.forEach(function (entry) {
 
-                menuToggle.setAttribute(
-                    "aria-label",
-                    "Open navigation menu"
-                );
+            if (entry.isIntersecting) {
+
+                const currentSection = entry.target.id;
+
+                navItems.forEach(function (link) {
+
+                    link.classList.remove("active");
+
+                    if (
+                        link.getAttribute("href") ===
+                        "#" + currentSection
+                    ) {
+                        link.classList.add("active");
+                    }
+
+                });
+
             }
 
         });
 
+    },
+    {
+        threshold: 0.35
     }
+);
 
 
-    /* =========================
-       ACTIVE NAVIGATION
-       Highlights the link for
-       the section currently visible.
-    ========================== */
+sections.forEach(function (section) {
 
-    const navObserver = new IntersectionObserver(
-        function (entries) {
+    observer.observe(section);
 
-            entries.forEach(function (entry) {
-
-                if (entry.isIntersecting) {
-
-                    const currentSection = entry.target.id;
-
-                    navLinks.forEach(function (link) {
-
-                        const linkSection =
-                            link.getAttribute("href");
-
-                        if (linkSection === "#" + currentSection) {
-                            link.classList.add("active");
-                        } else {
-                            link.classList.remove("active");
-                        }
-
-                    });
-
-                }
-
-            });
-
-        },
-        {
-            root: null,
-            threshold: 0.25,
-            rootMargin: "-20% 0px -55% 0px"
-        }
-    );
+});
 
 
-    sections.forEach(function (section) {
-        navObserver.observe(section);
-    });
+// ================================
+// SCROLL REVEAL
+// ================================
+
+const revealElements =
+    document.querySelectorAll(".reveal");
 
 
-    /* =========================
-       SCROLL REVEAL
-       Uses IntersectionObserver
-       for better mobile performance.
-    ========================== */
+const revealObserver = new IntersectionObserver(
+    function (entries, observer) {
 
-    const revealElements =
-        document.querySelectorAll(".reveal");
+        entries.forEach(function (entry) {
 
-    const revealObserver = new IntersectionObserver(
-        function (entries, observer) {
+            if (entry.isIntersecting) {
 
-            entries.forEach(function (entry) {
+                entry.target.classList.add("visible");
 
-                if (entry.isIntersecting) {
+                observer.unobserve(entry.target);
 
-                    entry.target.classList.add("visible");
+            }
 
-                    // Stop observing after the element appears
-                    observer.unobserve(entry.target);
-                }
+        });
 
-            });
-
-        },
-        {
-            threshold: 0.12
-        }
-    );
+    },
+    {
+        threshold: 0.15
+    }
+);
 
 
-    revealElements.forEach(function (element) {
-        revealObserver.observe(element);
-    });
+revealElements.forEach(function (element) {
 
-
-    /* =========================
-       KEYBOARD ACCESSIBILITY
-       Close mobile menu with Escape.
-    ========================== */
-
-    document.addEventListener("keydown", function (event) {
-
-        if (
-            event.key === "Escape" &&
-            navMenu &&
-            navMenu.classList.contains("active")
-        ) {
-
-            navMenu.classList.remove("active");
-
-            menuToggle.setAttribute("aria-expanded", "false");
-
-            menuToggle.setAttribute(
-                "aria-label",
-                "Open navigation menu"
-            );
-
-            menuToggle.focus();
-        }
-
-    });
+    revealObserver.observe(element);
 
 });
